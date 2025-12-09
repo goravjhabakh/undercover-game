@@ -25,7 +25,8 @@ const initialRoomState = ({ host, settings }) => ({
     civilian: null,
     undercover: null
   },
-  logs: []
+  logs: [],
+  lastVotingLogCount: 0
 })
 
 export { generateRoomId, createPlayer, initialRoomState }

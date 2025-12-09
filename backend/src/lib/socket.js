@@ -1,7 +1,7 @@
 import { handleCreateRoom, handleJoinRoom } from "../controllers/room.js";
 import redis from "./redis.js";
 import { Server } from "socket.io";
-import { handleDisconnect, handleStartGame } from "../controllers/game.js";
+import { handleDisconnect, handleStartGame, handleSubmitDescription, handleVote } from "../controllers/game.js";
 
 const initSocket = (httpServer) => {
   const io = new Server(httpServer, {
@@ -24,6 +24,8 @@ const initSocket = (httpServer) => {
     socket.on('createRoom', (payload) => handleCreateRoom(socket, io, payload))
     socket.on('joinRoom', (payload) => handleJoinRoom(socket, io, payload))
     socket.on('startGame', (payload) => handleStartGame(socket, io, payload))
+    socket.on('submitDescription', (payload) => handleSubmitDescription(socket, io, payload))
+    socket.on('vote', (payload) => handleVote(socket, io, payload))
 
     socket.on('disconnect', () => {
       console.log(`User disconnected: ${socket.id}`)
