@@ -34,3 +34,31 @@ export const saveRoom = async (roomData) => {
   const roomJSON = JSON.stringify(roomData)
   return await redis.set(roomKey(roomData.id), roomJSON, 'EX', roomExpiry)
 }
+
+export const removePlayerBySocketId = async (socketId) => {
+  const keys = await redis.keys(roomKey('*'))
+
+  for (const key of keys) {
+    const roomJSON = await redis.get(key)
+    if (!roomJSON) continue
+
+    const room = JSON.parse(roomJSON)
+    const playerIndex = room.players.findIndex(p => p.socketId === socketId)
+    if (playerIndex === -1) continue
+
+    const player = room.players[playerIndex]
+    room.players.splice(playerIndex, 1)
+    console.log(`Removed player ${player.nickname} from room ${room.id}`)
+    console.log(`Remaining players: ${room.players.length}`)
+
+    if (room.players.length === 0) {
+      console.log(`Room ${room.id} is empty, removing...`)
+      await redis.del(key)
+      return room.id
+    }
+
+    await saveRoom(room)
+    return room.id
+  }
+  return null
+}
