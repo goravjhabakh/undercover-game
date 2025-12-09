@@ -10,8 +10,5 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "socket.io": "^4.8.1"
-  }
+  "type": "commonjs"
 }
