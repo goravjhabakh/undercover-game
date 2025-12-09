@@ -1,4 +1,4 @@
-import { createRoom, getRoomById, saveRoom } from "../repository/room.js"
+import { createRoom, getRoomById, saveRoom, addSocketMapping } from "../repository/room.js"
 import { createPlayer } from "../lib/gameState.js"
 
 export const handleCreateRoom = async (socket, io, payload) => {
@@ -66,6 +66,7 @@ export const handleJoinRoom = async(socket, io, payload) => {
   const newPlayer = createPlayer({ socketId: socket.id, nickname, avatar })
   room.players.push(newPlayer)
 
+  await addSocketMapping(socket.id, roomId)
   await saveRoom(room)
   socket.join(roomId)
   socket.emit('roomJoined', room)

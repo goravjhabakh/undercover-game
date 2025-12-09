@@ -4,6 +4,16 @@ import { initialRoomState, generateRoomId } from '../lib/gameState.js'
 const roomKey = (roomId) => `room:${roomId}`
 const roomExpiry = 60 * 60 * 24 // 24hrs
 
+const socketKey = (socketId) => `socket:${socketId}`
+
+export const addSocketMapping = async (socketId, roomId) => {
+  await redis.set(socketKey(socketId), roomId, 'EX', roomExpiry)
+}
+
+export const removeSocketMapping = async (socketId) => {
+  await redis.del(socketKey(socketId))
+}
+
 export const createRoom = async({ host, settings }) => {
   let roomId
   let roomData
@@ -18,7 +28,10 @@ export const createRoom = async({ host, settings }) => {
   const roomJSON = JSON.stringify(roomData)
   const res = await redis.set(roomKey(roomId), roomJSON, 'EX', roomExpiry)
 
-  if (res == 'OK') return roomData
+  if (res == 'OK') {
+      await addSocketMapping(host.socketId, roomId)
+      return roomData
+  }
   return null
 }
 
@@ -36,29 +49,36 @@ export const saveRoom = async (roomData) => {
 }
 
 export const removePlayerBySocketId = async (socketId) => {
-  const keys = await redis.keys(roomKey('*'))
+  // Optimization: specific lookup instead of scan
+  const roomId = await redis.get(socketKey(socketId))
+  if (!roomId) return null
 
-  for (const key of keys) {
-    const roomJSON = await redis.get(key)
-    if (!roomJSON) continue
-
-    const room = JSON.parse(roomJSON)
-    const playerIndex = room.players.findIndex(p => p.socketId === socketId)
-    if (playerIndex === -1) continue
-
-    const player = room.players[playerIndex]
-    room.players.splice(playerIndex, 1)
-    console.log(`Removed player ${player.nickname} from room ${room.id}`)
-    console.log(`Remaining players: ${room.players.length}`)
-
-    if (room.players.length === 0) {
-      console.log(`Room ${room.id} is empty, removing...`)
-      await redis.del(key)
-      return room.id
-    }
-
-    await saveRoom(room)
-    return room.id
+  const room = await getRoomById(roomId)
+  if (!room) {
+      // Clean up dangling socket mapping
+      await removeSocketMapping(socketId)
+      return null
   }
-  return null
+
+  const playerIndex = room.players.findIndex(p => p.socketId === socketId)
+  if (playerIndex === -1) {
+      await removeSocketMapping(socketId) // Should not happen if consistent
+      return null
+  }
+
+  const player = room.players[playerIndex]
+  room.players.splice(playerIndex, 1)
+  console.log(`Removed player ${player.nickname} from room ${room.id}`)
+  console.log(`Remaining players: ${room.players.length}`)
+
+  await removeSocketMapping(socketId)
+
+  if (room.players.length === 0) {
+    console.log(`Room ${room.id} is empty, removing...`)
+    await redis.del(roomKey(roomId))
+    return roomId
+  }
+
+  await saveRoom(room)
+  return roomId
 }
