@@ -72,7 +72,7 @@ export const handleJoinRoom = async(socket, io, payload) => {
   socket.emit('roomJoined', room)
 
   io.to(roomId).emit('playerJoined', {
-    player: { nickname: newPlayer.nickname, avatar: newPlayer.avatar },
+    player: newPlayer,
     count: room.players.length
   })
 

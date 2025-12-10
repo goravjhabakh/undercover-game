@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Navbar from "./components/Navbar"
 import LandingPage from "./pages/LandingPage"
 import RoomPage from "./pages/RoomPage"
+import { Toaster } from "@/components/ui/sonner"
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/room/:roomId" element={<RoomPage />} />
         </Routes>
+        <Toaster />
       </main>
     </BrowserRouter>
   )
