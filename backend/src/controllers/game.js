@@ -33,7 +33,7 @@ export const handleStartGame = async (socket, io, payload) => {
 
       if (!room) return socket.emit('error', { message: 'Room not found' })
       if (!room.players.find(p => p.socketId === socket.id && p.isHost)) return socket.emit('error', { message: 'Only host can start the game' })
-      if (room.players.length < 4) return socket.emit('error', { message: 'At least 4 players are required to start the game' })
+      if (room.players.length < 3) return socket.emit('error', { message: 'At least 3 players are required to start the game' })
 
       const updatedRoom = assignRolesAndWords({ room })
       updatedRoom.status = 'PLAYING'
@@ -138,7 +138,9 @@ export const handleVote = async (socket, io, payload) => {
         io.to(roomId).emit('voteResult', {
           eliminateResult,
           status: updatedRoom.status,
-          currentTurnIndex: updatedRoom.currentTurnIndex
+          currentTurnIndex: updatedRoom.currentTurnIndex,
+          players: updatedRoom.status === 'GAME_OVER' ? updatedRoom.players : undefined,
+          words: updatedRoom.status === 'GAME_OVER' ? updatedRoom.words : undefined
         })
         console.log(`Vote result in room ${roomId}:`, eliminateResult)
       }
