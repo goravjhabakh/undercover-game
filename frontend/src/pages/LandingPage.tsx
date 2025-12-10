@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createAvatar } from '@dicebear/core';
 import { micah } from '@dicebear/collection';
-import HostDialog from "../components/HostDialog"
-import JoinDialog from "../components/JoinDialog"
+import HostDialog from "../components/landing/HostDialog"
+import JoinDialog from "../components/landing/JoinDialog"
 
 const LandingPage = () => {
   const [nickname, setNickname] = useState('')

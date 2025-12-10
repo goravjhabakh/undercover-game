@@ -66,7 +66,7 @@ export interface ServerToClientEvents {
   roomCreated: (room: Room) => void;
   error: (data: { message: string }) => void;
   roomJoined: (room: Room) => void;
-  playerJoined: (data: { player: { nickname: string, avatar: string }, count: number }) => void;
+  playerJoined: (data: { player: Player, count: number }) => void;
   playerDisconnected: (data: { socketId: string, count: number }) => void;
   gameStarted: (roomState: SafeRoomState) => void;
   privateRoleReveal: (data: { role: string, word: string }) => void;
