@@ -40,6 +40,7 @@ export interface Room {
   };
   logs: Log[];
   lastVotingLogCount: number;
+  winner?: 'CIVILIAN' | 'UNDERCOVER' | null;
 }
 
 export interface SafeRoomState {
@@ -72,7 +73,7 @@ export interface ServerToClientEvents {
   privateRoleReveal: (data: { role: string, word: string }) => void;
   voting: (data: { status: 'VOTING', logs: Log[] }) => void;
   nextTurn: (data: { nextTurnIndex: number, newLog: Log, currentStatus: string }) => void;
-  voteResult: (data: { eliminateResult: EliminateResult, status: string, currentTurnIndex: number }) => void;
+  voteResult: (data: { eliminateResult: EliminateResult, status: string, currentTurnIndex: number, players?: Player[], words?: { civilian: string | null, undercover: string | null } }) => void;
 }
 
 export interface ClientToServerEvents {

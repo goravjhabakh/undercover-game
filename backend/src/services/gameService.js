@@ -40,7 +40,7 @@ export const checkWinCondition = ({ room }) => {
   const undercovers = alive.filter(p => p.role === 'UNDERCOVER').length
 
   if (undercovers === 0 && civilians > 0) return { winner: 'CIVILIAN', status: 'GAME_OVER' }
-  if (civilians === 0 && undercovers > 0) return { winner: 'UNDERCOVER', status: 'GAME_OVER' }
+  if (civilians <= 1 && undercovers > 0) return { winner: 'UNDERCOVER', status: 'GAME_OVER' }
   return null
 }
 
@@ -118,6 +118,7 @@ export const processVotesAndCheckWin = (room) => {
 
   if (eliminateResult.gameResult) {
     room.status = 'GAME_OVER'
+    room.winner = eliminateResult.gameResult.winner
   } else {
     room.status = 'PLAYING'
     room.lastVotingLogCount = room.logs.length // Mark start of new round
