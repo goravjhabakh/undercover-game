@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client'
 
-const SOCKET_URL = import.meta.env.NODE_ENV === 'production' ? 'https://undercover-game-3yjq.onrender.com' : 'http://localhost:3000'
+const SOCKET_URL = import.meta.env.PROD ? '/' : 'http://localhost:3000';
 
 export interface Player {
   socketId: string;
